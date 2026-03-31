@@ -1,0 +1,93 @@
+package data
+
+import (
+	"encoding/json"
+)
+
+// 未解析之前的消息
+type NoDecoderMsg struct {
+	SessionId int64
+	SnId      int
+	Msg       string
+}
+
+func (this NoDecoderMsg) MsgSnId() int {
+	return this.SnId
+}
+
+// 解码消息
+func Decoder(ndMsg NoDecoderMsg) (error, *WsMsg) {
+
+	msg := WsMsg{}
+	err := json.Unmarshal([]byte(ndMsg.Msg), &msg)
+
+	if err != nil {
+
+		switch msg.Cmd {
+		case Subscription:
+		//订阅消息
+		case Publish:
+			//发布消息
+		case UnSubscription:
+			//取消订阅消息
+		case Notice:
+			//通知消息
+		case Request:
+			//请求消息
+		case Response:
+			//回复消息
+		default:
+			//fmt.Printf("未知的消息指令 %v ", msg.Cmd)
+			msg.Content = json.RawMessage(ndMsg.Msg)
+			return err, &msg
+		}
+	} else {
+
+	}
+
+	return err, &msg
+
+	// if err == nil {
+
+	// 	// fmt.Printf("obj = %#v \n", base)
+
+	// 	// var msg any
+
+	// 	// switch base.Cmd {
+	// 	// case Subscription:
+	// 	// 	//订阅消息
+	// 	// 	msg = SubscriptionMsg{}
+	// 	// case Publish:
+	// 	// 	msg = PublishMsg{}
+	// 	// 	//发布消息
+	// 	// case UnSubscription:
+	// 	// 	//取消订阅消息
+	// 	// 	msg = UnSubscriptionMsg{}
+	// 	// 	//发布消息
+	// 	// case Notice:
+	// 	// 	msg = NoticeMsg{}
+	// 	// 	//通知消息
+	// 	// case Request:
+	// 	// 	msg = RequestMsg{}
+	// 	// 	//请求消息
+	// 	// case Response:
+	// 	// 	msg = ResponseMsg{}
+	// 	// 	//回复消息
+	// 	// default:
+	// 	// 	fmt.Printf("未知的消息指令 %v ", base.Cmd)
+	// 	// 	return &base
+	// 	// }
+
+	// 	// err = json.Unmarshal([]byte(ndMsg.Msg), &msg)
+	// 	// if err == nil {
+	// 	// 	return msg.(*BaseMsg)
+	// 	// }
+	// 		return &base
+	// } else {
+	// 	//不符合规范的消息
+	// 	fmt.Printf("收到不规范的消息 %#v ", ndMsg)
+	// 	return
+	// }
+
+	// return &base
+}
