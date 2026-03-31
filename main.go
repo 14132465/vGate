@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
-
-	ws "github.com/14132465/vGate/net"
-	"github.com/14132465/vGate/net/data"
+	"github.com/14132465/vGate/net"
+	"github.com/14132465/vGate/net/handler"
 )
 
 func main() {
@@ -29,10 +27,7 @@ func main() {
 	// 	fmt.Println(msg.Type)            // "publish"
 	// 	fmt.Println(string(msg.Payload)) // {"clientId":"client123","topic":"test","content":"hello world"}
 
-	ws.NewWsServer().Config(8080, "/").Handler(func(msg data.WsMsg) {
-
-		fmt.Printf("  main  ---- handler :  msg = %#v  \n", msg)
-
-	}).Run()
+	handler := handler.GateHandler{}
+	net.NewWsServer().Config(8080, "/").Handler(&handler).Run()
 
 }

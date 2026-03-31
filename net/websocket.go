@@ -1,4 +1,4 @@
-package ws
+package net
 
 import (
 	"fmt"
@@ -9,15 +9,17 @@ import (
 
 	"github.com/14132465/vGate/coroutine"
 	"github.com/14132465/vGate/net/data"
+	"github.com/14132465/vGate/net/handler"
 
 	ws "github.com/gorilla/websocket"
 )
 
 type WsServer struct {
-	Port string
-	Path string
-	pool *coroutine.CoroutineGroup
-	fun  func(msg data.WsMsg)
+	Port    string
+	Path    string
+	pool    *coroutine.CoroutineGroup
+	handler handler.HandlerInterface
+	//fun     func(msg data.WsMsg)
 }
 
 func (this *WsServer) Config(Port int, Path string) *WsServer {
@@ -36,7 +38,8 @@ func NewWsServer() *WsServer {
 			_, wsMsg := data.Decoder(nd)
 
 			fmt.Print("wsMsg ######## ,", wsMsg)
-			ws.fun(*wsMsg)
+			ws.handler.OnMessage(wsMsg)
+			//ws.fun(*wsMsg)
 
 		} else {
 			fmt.Printf("无法解析的消息类型 %v ", msg)
@@ -47,8 +50,8 @@ func NewWsServer() *WsServer {
 	return &ws
 }
 
-func (this *WsServer) Handler(fun func(msg data.WsMsg)) *WsServer {
-	this.fun = fun
+func (this *WsServer) Handler(handler handler.HandlerInterface) *WsServer {
+	this.handler = handler
 	return this
 }
 
@@ -77,13 +80,8 @@ func (this *WsServer) handleWsServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
-	// 将新连接添加到会话管理器
-	session := data.SessionManagerInstance.AddSession(&data.Session{
-		UUID:   -1,
-		Status: 1,
-		Resp:   &w,
-		Req:    r,
-	})
+
+	session := this.handler.OnConnect(&w, r)
 
 	for {
 		// 读取客户端消息
@@ -111,6 +109,7 @@ func (this *WsServer) handleWsServer(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	this.handler.OnDisconnect(session)
 }
 
 func (this *WsServer) Test() {
