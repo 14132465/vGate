@@ -1,4 +1,4 @@
-module test
+module github.com/14132465/vGate
 
 go 1.25.4
 

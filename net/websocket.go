@@ -6,8 +6,9 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
-	"test/coroutine"
-	"test/net/data"
+
+	"github.com/14132465/vGate/coroutine"
+	"github.com/14132465/vGate/net/data"
 
 	ws "github.com/gorilla/websocket"
 )

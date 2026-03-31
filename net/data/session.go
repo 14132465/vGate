@@ -27,7 +27,9 @@ var SessionManagerInstance *SessionManager
 func init() {
 	SessionManagerInstance = &SessionManager{
 		sessionMap: make(map[int64]*Session),
+		uuid:       atomic.Int64{},
 	}
+	SessionManagerInstance.uuid.Store(10000 * 10000 * 20) //初始值设置为一个较大的数[20亿]，避免与实际客户端ID冲突
 }
 
 // 根据客户端ID获取会话信息
