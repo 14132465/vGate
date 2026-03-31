@@ -47,48 +47,4 @@ func Decoder(ndMsg NoDecoderMsg) (error, *WsMsg) {
 	}
 
 	return err, &msg
-
-	// if err == nil {
-
-	// 	// fmt.Printf("obj = %#v \n", base)
-
-	// 	// var msg any
-
-	// 	// switch base.Cmd {
-	// 	// case Subscription:
-	// 	// 	//订阅消息
-	// 	// 	msg = SubscriptionMsg{}
-	// 	// case Publish:
-	// 	// 	msg = PublishMsg{}
-	// 	// 	//发布消息
-	// 	// case UnSubscription:
-	// 	// 	//取消订阅消息
-	// 	// 	msg = UnSubscriptionMsg{}
-	// 	// 	//发布消息
-	// 	// case Notice:
-	// 	// 	msg = NoticeMsg{}
-	// 	// 	//通知消息
-	// 	// case Request:
-	// 	// 	msg = RequestMsg{}
-	// 	// 	//请求消息
-	// 	// case Response:
-	// 	// 	msg = ResponseMsg{}
-	// 	// 	//回复消息
-	// 	// default:
-	// 	// 	fmt.Printf("未知的消息指令 %v ", base.Cmd)
-	// 	// 	return &base
-	// 	// }
-
-	// 	// err = json.Unmarshal([]byte(ndMsg.Msg), &msg)
-	// 	// if err == nil {
-	// 	// 	return msg.(*BaseMsg)
-	// 	// }
-	// 		return &base
-	// } else {
-	// 	//不符合规范的消息
-	// 	fmt.Printf("收到不规范的消息 %#v ", ndMsg)
-	// 	return
-	// }
-
-	// return &base
 }

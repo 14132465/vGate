@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// 一主多从线程组
+// 一个协程
 type Coroutine struct {
 	Name string
 	Id   int
@@ -29,6 +29,7 @@ func (this *Coroutine) init() {
 	this.queue = *list.New()
 }
 
+// 启动协程，持续处理消息 会阻塞 应当以  go Start() 启动
 func (this *Coroutine) Start() {
 
 	count := 0
