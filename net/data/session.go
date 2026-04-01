@@ -1,11 +1,11 @@
 package data
 
 import (
-	"fmt"
 	"runtime/debug"
 	"sync"
 	"sync/atomic"
 
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gorilla/websocket"
 )
 
@@ -21,13 +21,13 @@ type Session struct {
 func (this *Session) SendMessage(msg *WsMsg) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Printf(" panic: %v\n", err)
-			fmt.Printf(" Stack Info:\n %s \n", debug.Stack())
+			log.Error(" panic: %v\n", err)
+			log.Error(" Stack Info:\n %s \n", debug.Stack())
 		}
 	}()
 	err := this.Conn.WriteJSON(msg)
 	if err != nil {
-		fmt.Printf("SendMessage  error %v \n", err)
+		log.Error("SendMessage  error %v \n", err)
 	}
 }
 

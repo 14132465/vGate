@@ -5,7 +5,9 @@ import (
 	"log"
 	"math/rand"
 	"sync/atomic"
+	"time"
 
+	"github.com/14132465/vGate/net/app"
 	"github.com/14132465/vGate/net/coroutine"
 	"github.com/14132465/vGate/net/data"
 	"github.com/14132465/vGate/net/handler"
@@ -17,7 +19,9 @@ var uuid atomic.Int64
 type WsClient struct {
 	Path    string
 	pool    *coroutine.CoroutineGroup
-	handler handler.HandlerInterface
+	handler handler.WsHandlerInterface
+	//Conn    *websocket.Conn
+	*data.Session
 }
 
 func NewWsWsClient() *WsClient {
@@ -25,7 +29,7 @@ func NewWsWsClient() *WsClient {
 }
 
 // 配置消息处理器
-func (this *WsClient) Handler(handler handler.HandlerInterface) *WsClient {
+func (this *WsClient) Handler(handler handler.WsHandlerInterface) *WsClient {
 	this.handler = handler
 	return this
 }
@@ -52,7 +56,12 @@ func (this *WsClient) Connect(onConnectedCallBack func(conn *websocket.Conn)) {
 	defer conn.Close()
 
 	//连接成功
+	//this.Conn = conn
 	session := this.handler.OnConnect(conn)
+	this.Session = session
+
+	this.setupHeartbeat()
+
 	if onConnectedCallBack != nil {
 		go onConnectedCallBack(conn)
 	}
@@ -72,8 +81,33 @@ func (this *WsClient) Connect(onConnectedCallBack func(conn *websocket.Conn)) {
 		}
 
 		fmt.Print(theMsg)
+		// 设置读取超时
+		this.Conn.SetReadDeadline(time.Now().Add(time.Duration(app.VGate.Config.Gate.ReadOverTime) * time.Second))
+
 		var v data.NoDecoderMsg = theMsg
 		_, WsMsg := data.Decoder(v)
 		this.handler.OnMessage(conn, WsMsg)
+	}
+}
+
+// 设置心跳
+func (this *WsClient) setupHeartbeat() {
+	// 启动心跳发送 goroutine
+	go this.sendHeartbeat()
+}
+
+// sendHeartbeat 定期发送 Ping
+func (this *WsClient) sendHeartbeat() {
+	ticker := time.NewTicker(time.Duration(app.VGate.Config.Gate.HeartbeatTime) * time.Second)
+	defer ticker.Stop()
+
+	for {
+		<-ticker.C // 阻塞等待 ticker 信号
+		if err := this.Session.Conn.WriteJSON(data.HeartbeatMsg()); err != nil {
+			log.Printf("发送 heartbeatMsg 失败: %v", err)
+			return
+		}
+		log.Println("发送 heartbeatMsg")
+
 	}
 }

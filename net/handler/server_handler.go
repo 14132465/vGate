@@ -13,7 +13,7 @@ type ServerHandler struct {
 }
 
 // 收到消息
-func (this *ServerHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) {
+func (this *ServerHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) error {
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -28,13 +28,19 @@ func (this *ServerHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) {
 		fmt.Printf("### ServerHandler  cmd = Notice, Topic = %v 通知消息，没有订阅，也会收到的类型 \n", msg.Topic)
 	case data.Request:
 		//客户端请求消息
-		//
+		by, err := msg.Content.MarshalJSON()
+		if err == nil {
+			return err
+		} else {
+			fmt.Printf(" recv  topic = %v msg = %v \n", msg.Topic, string(by))
+		}
 	default:
 		fmt.Printf("未知的消息指令 %v ", msg.Cmd)
 
 	}
 
 	fmt.Printf("	ServerHandler  OnMessage  msg = %#v  \n", msg)
+	return nil
 
 }
 

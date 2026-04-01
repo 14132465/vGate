@@ -3,10 +3,12 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/14132465/vGate/net/app"
 	"github.com/14132465/vGate/net/data"
 	"github.com/14132465/vGate/net/logic"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,7 +26,7 @@ func (this *GateHandler) checkSecretKey(key string) bool {
 }
 
 // 收到消息
-func (this *GateHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) {
+func (this *GateHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) error {
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -32,33 +34,44 @@ func (this *GateHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) {
 		}
 	}()
 
+	conn.SetReadDeadline(time.Now().Add(time.Duration(app.VGate.Config.Gate.ReadOverTime) * time.Second))
+
 	switch msg.Cmd {
+	case data.Heartbeat:
+		//心跳
+		err := conn.WriteJSON(msg)
+		if err != nil {
+			log.Error("SendMessage Heartbeat error %v \n", err)
+		}
+		return nil
 	case data.Subscription:
 		//订阅消息
 		if !this.checkSecretKey(msg.SecretKey) {
-			return
+			return nil
 		} else {
 			server := app.VGate.ServerManager.GetAndCreateServer(msg.SessionId)
 			if server != nil {
 				app.VGate.SubHelper.AddSubscriptionInfo(msg.Topic, server)
 			} else {
-				fmt.Printf("未找到会话ID %d 对应的服务器\n", msg.SessionId)
+				log.Error("未找到会话ID %d 对应的服务器\n", msg.SessionId)
 			}
 		}
+		return nil
 	// case data.Publish:
 	// 	//发布消息
 	case data.UnSubscription:
 		//取消订阅消息
 		if !this.checkSecretKey(msg.SecretKey) {
-			return
+			return nil
 		} else {
 			server := app.VGate.ServerManager.GetServerOnly(msg.SessionId)
 			if server != nil {
 				app.VGate.SubHelper.UnSubscriptionInfo(msg.Topic, server)
 			} else {
-				fmt.Printf("未找到会话ID %d 对应的服务器\n", msg.SessionId)
+				log.Error("未找到会话ID %d 对应的服务器\n", msg.SessionId)
 			}
 		}
+		return nil
 	case data.Notice:
 		//通知消息
 	case data.Request:
@@ -71,15 +84,14 @@ func (this *GateHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) {
 		if session != nil {
 			session.SendMessage(msg)
 		} else {
-			fmt.Printf("未找到会话ID %d 对应的客户端\n", msg.SessionId)
+			log.Error("未找到会话ID %d 对应的客户端\n", msg.SessionId)
 		}
 	default:
-		//fmt.Printf("未知的消息指令 %v ", msg.Cmd)
-
+		fmt.Printf("未知的消息指令 %v ", msg.Cmd)
+		//fmt.Printf("  GateHandler :  OnMessage  %v \n", msg)
 	}
 
-	fmt.Printf("  GateHandler :  OnMessage  %v \n", msg)
-
+	return nil
 }
 
 func (this *GateHandler) OnError(conn *websocket.Conn, err error) {
@@ -99,7 +111,7 @@ func (this *GateHandler) OnConnect(conn *websocket.Conn) *data.Session {
 	//通知客户端上线
 	lst := app.VGate.ServerManager.GetAlls()
 	by, _ := json.Marshal(session)
-	noticeMsg := data.BuildNoticeMsg(app.VGate.SecretKey, logic.Notice_On_Line, string(by))
+	noticeMsg := data.BuildNoticeMsg(app.VGate.Config.Gate.SecretKey, logic.Notice_On_Line, string(by))
 	for _, server := range lst {
 		if server != nil {
 			server.SendMessage(noticeMsg)
@@ -121,7 +133,7 @@ func (this *GateHandler) OnDisconnect(session *data.Session) {
 		lst := app.VGate.ServerManager.GetAlls()
 		for _, server := range lst {
 			by, _ := json.Marshal(session)
-			noticeMsg := data.BuildNoticeMsg(app.VGate.SecretKey, logic.Notice_Off_Line, string(by))
+			noticeMsg := data.BuildNoticeMsg(app.VGate.Config.Gate.SecretKey, logic.Notice_Off_Line, string(by))
 			server.SendMessage(noticeMsg)
 		}
 

@@ -16,13 +16,23 @@ const (
 	Request = "request"
 	//回复 服务器回复客户端的请求
 	Response = "response"
+	//心跳 收到心跳后 网关会立即回复
+	Heartbeat = "heartbeat"
 )
 
 // 基础消息
 type BaseMsg struct {
 	Cmd   string `json:"cmd"`   //消息指令 如：订阅Subscription、发布Publish、通知Notice、请求Request、回复Response等
 	Topic string `json:"topic"` //订阅主题
+}
 
+//心跳
+type heartbeatMsg struct {
+	Cmd string `json:"cmd"` //消息指令 如：订阅Subscription、发布Publish、通知Notice、请求Request、回复Response等
+}
+
+func HeartbeatMsg() *heartbeatMsg {
+	return &heartbeatMsg{Cmd: Heartbeat}
 }
 
 // 订阅消息 服务器向网关发起订阅请求

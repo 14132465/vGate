@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/14132465/vGate/net"
+	"github.com/14132465/vGate/net/app"
 	"github.com/14132465/vGate/net/handler"
 	"github.com/14132465/vGate/net/logic"
 	"github.com/gorilla/websocket"
@@ -14,8 +15,8 @@ func main() {
 
 	//业务处理器
 	server.Handler(&handler.ServerHandler{})
-
-	var secretKey string = "ga-23xk=v"
+	//通信密钥
+	var secretKey string = app.VGate.Config.Gate.SecretKey
 
 	//请求连接
 	server.Connect(func(conn *websocket.Conn) {
