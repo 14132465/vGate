@@ -1,7 +1,6 @@
 package net
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -85,7 +84,7 @@ func (this *WsServer) wsServerHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		fmt.Printf("网关收到消息 msg = %v \n", string(msg))
+		//fmt.Printf("网关收到消息 msg = %v \n", string(msg))
 
 		var theMsg data.NoDecoderMsg
 
@@ -97,7 +96,7 @@ func (this *WsServer) wsServerHandler(w http.ResponseWriter, r *http.Request) {
 
 		WsMsg, _ := data.GateDecoder(theMsg)
 
-		fmt.Printf("处理后的消息 msg = %#v \n", WsMsg)
+		//fmt.Printf("data.GateDecoder 处理后的消息 msg = %#v \n", WsMsg)
 
 		this.handler.OnMessage(conn, WsMsg)
 

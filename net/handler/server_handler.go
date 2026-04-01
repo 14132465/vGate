@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/14132465/vGate/net/app"
@@ -52,7 +53,14 @@ func (this *ServerHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) erro
 	default:
 		log.Error(fmt.Sprintf("未知的消息指令 %#v \n ", msg))
 	}
-	log.Info(fmt.Sprintf("	ServerHandler  OnMessage  msg = %#v  \n", msg))
+
+	custom := data.CustomMessage{
+		WsMsg:      *msg,
+		HideFields: []string{"content", "secretKey"}, // 隐藏敏感字段
+	}
+	jsonData, _ := json.Marshal(custom)
+	//jsonData, _ := json.MarshalIndent(custom, "", "  ")
+	log.Info(fmt.Printf("  GateHandler :  OnMessage  %v \n", string(jsonData)))
 	return nil
 
 }

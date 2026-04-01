@@ -1,6 +1,10 @@
 package data
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"reflect"
+	"strings"
+)
 
 const (
 	//订阅消息   一般是服务器向网关，订阅来自客户端消息
@@ -47,14 +51,14 @@ func (this *BaseMsg) GetContent() json.RawMessage {
 	return this.Content
 }
 
-//心跳
+// 心跳
 type heartbeatMsg struct {
 	Cmd string `json:"cmd"` //消息指令 如：订阅Subscription、发布Publish、通知Notice、请求Request、回复Response等
 }
 
 var heartbeatMsgInstance *heartbeatMsg
 
-//心跳消息
+// 心跳消息
 func HeartbeatMsg() *heartbeatMsg {
 	if heartbeatMsgInstance == nil {
 		heartbeatMsgInstance = &heartbeatMsg{Cmd: Heartbeat}
@@ -99,8 +103,52 @@ type ResponseMsg = RequestMsg
 // 兼容所有种类的消息
 type WsMsg struct {
 	BaseMsg
-	SessionId  int64           `json:"sessionId"`  //发布消息的客户端ID
 	ServerName string          `json:"serverName"` //服务器名称
+	SessionId  int64           `json:"sessionId"`  //发布消息的客户端ID
 	SecretKey  string          `json:"secretKey"`  //密钥
 	Content    json.RawMessage `json:"content"`    // 保留原始 JSON
+}
+
+// CustomMessage 自定义序列化
+type CustomMessage struct {
+	WsMsg
+	HideFields []string `json:"-"` // 要隐藏的字段
+}
+
+// 自定义 MarshalJSON 方法
+func (c CustomMessage) MarshalJSON() ([]byte, error) {
+	// 创建一个map来存储要序列化的字段
+	result := make(map[string]interface{})
+
+	// 使用反射获取Message结构体的值
+	msgValue := reflect.ValueOf(c.WsMsg)
+	msgType := reflect.TypeOf(c.WsMsg)
+
+	// 遍历Message的所有字段
+	for i := 0; i < msgValue.NumField(); i++ {
+		field := msgType.Field(i)
+		fieldValue := msgValue.Field(i)
+
+		// 获取json标签
+		jsonTag := field.Tag.Get("json")
+		if jsonTag == "" || jsonTag == "-" {
+			jsonTag = strings.ToLower(field.Name)
+		}
+
+		// 检查是否需要隐藏此字段
+		shouldHide := false
+		for _, hideField := range c.HideFields {
+			if strings.EqualFold(hideField, jsonTag) || strings.EqualFold(hideField, field.Name) {
+				shouldHide = true
+				break
+			}
+		}
+
+		// 如果不需要隐藏，则添加到结果map中
+		if !shouldHide {
+			result[jsonTag] = fieldValue.Interface()
+		}
+	}
+
+	return json.Marshal(result)
 }

@@ -36,7 +36,14 @@ func (this *GateHandler) OnMessage(conn *websocket.Conn, msg *data.WsMsg) error 
 
 	conn.SetReadDeadline(time.Now().Add(time.Duration(app.VGate.Config.Gate.ReadOverTime) * time.Second))
 
-	fmt.Printf("  GateHandler :  OnMessage  %#v \n", msg)
+	custom := data.CustomMessage{
+		WsMsg:      *msg,
+		HideFields: []string{"content", "secretKey"}, // 隐藏敏感字段
+	}
+	jsonData, _ := json.Marshal(custom)
+	//jsonData, _ := json.MarshalIndent(custom, "", "  ")
+
+	fmt.Printf("  GateHandler :  OnMessage  %v \n", string(jsonData))
 
 	switch msg.Cmd {
 	case data.Heartbeat:
