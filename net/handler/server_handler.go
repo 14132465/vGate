@@ -69,7 +69,12 @@ func (this *ServerHandler) OnConnect(conn *websocket.Conn) *data.Session {
 		Status: 1,
 		Conn:   conn,
 	})
-	log.Info(fmt.Sprintf("  serverHandler :  OnConnect session = %#v ", session))
+	if session == nil {
+		fmt.Print("debug break!")
+	} else {
+
+		log.Info(fmt.Sprintf("  serverHandler :  OnConnect session = %#v ", session))
+	}
 	return session
 }
 

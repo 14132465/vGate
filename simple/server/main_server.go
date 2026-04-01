@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/14132465/vGate/net"
 	"github.com/14132465/vGate/net/app"
 	"github.com/14132465/vGate/net/handler"
@@ -14,7 +16,7 @@ func main() {
 	iniRegistry()
 
 	//创建服务端
-	server := net.NewWsClient().Config("ws://localhost:8080/")
+	server := net.NewWsClientAlwaysOnlie().Config("ws://localhost:8080/")
 
 	//业务处理器
 	server.Handler(&handler.ServerHandler{})
@@ -35,6 +37,10 @@ func main() {
 		sender.Subscription(Hall_Game_List) //订阅游戏列表
 
 	})
+
+	for {
+		time.Sleep(time.Millisecond * 1)
+	}
 
 }
 
