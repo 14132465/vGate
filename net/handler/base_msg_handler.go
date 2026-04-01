@@ -32,7 +32,7 @@ func (this *BaseMsgHandler) Init() error {
 	return nil
 }
 
-// PreProcess 默认实现
+// BeforeProcess 默认实现
 func (this *BaseMsgHandler) BeforeProcess() error {
 	// 子类可以重写
 	return nil
@@ -43,7 +43,7 @@ func (this *BaseMsgHandler) Process() error {
 	return fmt.Errorf("Process method not implemented")
 }
 
-// PostProcess 默认实现
+// AfterProcess 默认实现
 func (this *BaseMsgHandler) AfterProcess() {
 	// 记录处理时间
 	// 注意：需要在消息中存储开始时间，这里简化处理
