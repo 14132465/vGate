@@ -1,6 +1,7 @@
 package net
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -16,11 +17,9 @@ import (
 
 // WsServer结构体表示一个WebSocket服务器，包含端口、路径、协程池和消息处理器等信息
 type WsServer struct {
-	Port string
-	Path string
-	//pool    *coroutine.CoroutineGroup
+	Port    string
+	Path    string
 	handler handler.WsHandlerInterface
-	//fun     func(msg data.WsMsg)
 }
 
 // 配置 WsServer 的端口和路径
@@ -43,11 +42,10 @@ func (this *WsServer) Handler(handler handler.WsHandlerInterface) *WsServer {
 }
 
 // 运行 WsServer，监听指定端口并处理 WebSocket 连接和消息
-func (this *WsServer) Run() *WsServer {
+func (this *WsServer) Run() error {
 	http.HandleFunc(this.Path, this.wsServerHandler)
-	log.Println("WsServer run , port = " + this.Port)
-	log.Fatal(http.ListenAndServe(":"+this.Port, nil))
-	return this
+	app.Log.Info("WsServer run , port : " + this.Port)
+	return http.ListenAndServe(":"+this.Port, nil)
 }
 
 // 配置 Upgrader，用于将 HTTP 连接升级为 WsServer
@@ -65,7 +63,7 @@ func (this *WsServer) wsServerHandler(w http.ResponseWriter, r *http.Request) {
 	// 升级 HTTP 连接为 WsServer
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("升级失败:", err)
+		app.Log.Info(fmt.Sprintf("升级失败:", err))
 		return
 	}
 	defer conn.Close()

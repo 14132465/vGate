@@ -80,12 +80,13 @@ func (this *WsClient) Connect(onConnectedCallBack func(conn *websocket.Conn)) (*
 	for i := 0; i < this.maxRetries; i++ {
 
 		if i%logOutNum == 0 {
-			log.Printf("尝试连接 (第 %d/%d 次)...", i+1, this.maxRetries)
+
+			app.Log.Info(fmt.Sprintf("尝试连接 (第 %d/%d 次)...", i+1, this.maxRetries))
 		}
 
 		conn, _, err = websocket.DefaultDialer.Dial(this.Path, nil)
 		if err == nil {
-			log.Println("连接成功！")
+			app.Log.Info("连接成功！")
 
 			//连接成功
 			session := this.handler.OnConnect(conn)
@@ -106,11 +107,11 @@ func (this *WsClient) Connect(onConnectedCallBack func(conn *websocket.Conn)) (*
 		// 检查是否是连接拒绝错误
 		if isConnectionRefused(err) {
 			if i%logOutNum == 0 {
-				log.Printf("连接被拒绝，服务可能未启动，%v 后重试...", this.retryInterval)
+				app.Log.Info(fmt.Sprintf("连接被拒绝，服务可能未启动，%v 后重试...", this.retryInterval))
 			}
 		} else {
 			if i%logOutNum == 0 {
-				log.Printf("连接失败: %v，  %v 后重试...", err, this.retryInterval)
+				app.Log.Info(fmt.Sprintf("连接失败: %v，  %v 后重试...", err, this.retryInterval))
 			}
 		}
 
@@ -144,24 +145,6 @@ func isConnectionRefused(err error) bool {
 
 	return false
 }
-
-// 重连
-// func (this *WsClient) reConnect(onConnectedCallBack func(conn *websocket.Conn)) {
-
-// 	fmt.Println("reConnect  启动 ")
-// 	for {
-// 		if !this.isConnected {
-// 			err := this.Connect(onConnectedCallBack)
-// 			if err == nil {
-// 				log.Println("重连成功")
-// 				break //退出循环 go
-// 			} else {
-// 				time.Sleep(time.Millisecond * 100)
-// 			}
-// 		}
-// 		time.Sleep(time.Millisecond * 50)
-// 	}
-// }
 
 // 循环读取消息
 func (this *WsClient) readMsg() error {
@@ -206,11 +189,11 @@ func (this *WsClient) sendHeartbeat() {
 	for {
 		<-ticker.C // 阻塞等待 ticker 信号
 		if err := this.Session.Conn.WriteJSON(data.HeartbeatMsg()); err != nil {
-			log.Printf("发送 heartbeatMsg 失败: %v", err)
+			app.Log.Info(fmt.Sprintf("发送 heartbeatMsg 失败: %v", err))
 			return
 		}
 		// 设置读取超时
 		this.Conn.SetReadDeadline(time.Now().Add(time.Duration(app.VGate.Config.Gate.ReadOverTime) * time.Second))
-		log.Println("发送 heartbeatMsg")
+		app.Log.Info("发送 heartbeatMsg")
 	}
 }

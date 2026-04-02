@@ -6,7 +6,35 @@
 
 本项目按照三个职能来设计
 
+
+
+
 -  **网关：**
+
+```go
+package main
+
+import (
+	"github.com/14132465/vGate/net"
+	"github.com/14132465/vGate/net/app"
+	_ "github.com/14132465/vGate/net/app"
+	"github.com/14132465/vGate/net/handler"
+	"go.uber.org/zap"
+)
+
+func main() {
+
+	defer app.Log.Sync() //
+
+	handler := handler.GateHandler{}
+	err := net.NewWsServer().Config(8080, "/").Handler(&handler).Run()
+	if err != nil {
+		app.Log.Fatal("Server failed to start: ", zap.Error(err))
+	}
+
+}
+
+```
 
    维护服务端的订阅数据，可Subscription（订阅） UnSubscription(取消订阅)
 
@@ -20,6 +48,9 @@
 
 -  **服务端：**
 
+
+
+
    1 可向网关 Subscription（订阅） UnSubscription(取消订阅) 。 网关会将topic相符的消息发布给服务
 
    2 同一个 topic 有多个服务端 订阅，多个服务端都会收到该 topic所属的消息
@@ -27,6 +58,55 @@
    3 将业务处理的结果，通知到指定的客户端
 
    4 断线重连 、离线订阅 待开发
+
+```go
+package main
+
+import (
+	"github.com/14132465/vGate/net"
+	"github.com/14132465/vGate/net/app"
+	"github.com/14132465/vGate/net/handler"
+	msg_handler "github.com/14132465/vGate/simple/server/handler"
+	"github.com/gorilla/websocket"
+)
+
+func main() {
+
+	//注册消息管理者
+	iniRegistry()
+
+	//创建服务端
+	server := net.NewWsClientAlwaysOnlie().Config("ws://localhost:8080/")
+
+	//业务处理器
+	server.Handler(&handler.ServerHandler{})
+	//通信密钥
+	var secretKey string = app.VGate.Config.Gate.SecretKey
+
+	//请求连接
+	server.Connect(func(conn *websocket.Conn) {
+		//绑定连接，向网关订阅 登录注册等 topic
+		app.Sender.BindConn(conn) // 帐号服务器 绑定连接
+		app.Sender.Config(true, "Server of account", secretKey)
+		//阅以下的主题消息
+		app.Sender.Subscription(User_Login) //订阅用户登录命令
+		app.Sender.Subscription(User_Register)
+		app.Sender.Subscription(Hall_Game_List) //订阅游戏列表
+	})
+
+}
+
+// 注册处理器
+func iniRegistry() {
+	registry := handler.NewRegistry()
+	registry.Register(handler.MsgHandlerCreate{
+		Topic:      "/user/login",
+		CreateFunc: msg_handler.NewLoginHandler,
+	})
+}
+
+```
+
 
 - **客户端**
 

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/14132465/vGate/net"
 	"github.com/14132465/vGate/net/app"
 	"github.com/14132465/vGate/net/handler"
@@ -25,32 +23,22 @@ func main() {
 
 	//请求连接
 	server.Connect(func(conn *websocket.Conn) {
-		//连接成功后，就订阅以下的主题消息
-
 		//绑定连接，向网关订阅 登录注册等 topic
-		sender := app.Sender
-		sender.BindConn(conn) // 帐号服务器 绑定连接
-		sender.Config(true, "Server of account", secretKey)
-		//"ga-23xk=v"
-		sender.Subscription(User_Login) //订阅用户登录命令
-		sender.Subscription(User_Register)
-		sender.Subscription(Hall_Game_List) //订阅游戏列表
-
+		app.Sender.BindConn(conn) // 帐号服务器 绑定连接
+		app.Sender.Config(true, "Server of account", secretKey)
+		//阅以下的主题消息
+		app.Sender.Subscription(User_Login) //订阅用户登录命令
+		app.Sender.Subscription(User_Register)
+		app.Sender.Subscription(Hall_Game_List) //订阅游戏列表
 	})
-
-	for {
-		time.Sleep(time.Millisecond * 1)
-	}
 
 }
 
+// 注册处理器
 func iniRegistry() {
 	registry := handler.NewRegistry()
-
-	topic := "/user/login"
 	registry.Register(handler.MsgHandlerCreate{
-		Topic:      topic,
+		Topic:      "/user/login",
 		CreateFunc: msg_handler.NewLoginHandler,
 	})
-
 }

@@ -30,8 +30,6 @@ vendor/
 # 日志文件
 *.log
 logs/
-resource/logs/
-resource/logs/*.log
 
 
 
