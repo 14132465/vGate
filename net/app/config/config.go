@@ -1,4 +1,4 @@
-package app
+package config
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type config struct {
+type RootConfig struct {
 	// GateConfig
 	// LogConfig
 	Gate struct {
@@ -20,13 +20,28 @@ type config struct {
 		ReadOverTime  int    `yaml:"ReadOverTime"`  //读超时
 
 	} `yaml:"gate"`
-	Log struct {
-		Open bool   `yaml:"open"`
-		Path string `yaml:"path"`
-	} `yaml:"log"`
+	Logger LoggerConfig `yaml:"logger"`
 }
 
-func getConfig(path string) *config {
+type LoggerConfig struct {
+	Level            string           `yaml:"level"`
+	Encoding         string           `yaml:"encoding"`
+	OutputPaths      []string         `yaml:"output_paths"`
+	ErrorOutputPaths []string         `yaml:"error_output_paths"`
+	Lumberjack       LumberjackConfig `yaml:"lumberjack"`
+	CallerSkip       int              `yaml:"caller_skip"`
+	AddCaller        bool             `yaml:"add_caller"`
+}
+
+type LumberjackConfig struct {
+	MaxSize    int  `yaml:"max_size"`
+	MaxBackups int  `yaml:"max_backups"`
+	MaxAge     int  `yaml:"max_age"`
+	Compress   bool `yaml:"compress"`
+}
+
+// 自动 在config目录查找 path
+func GetConfig(path string) *RootConfig {
 
 	cwd, _ := os.Getwd()
 	if folder, err := FindFolderUpward(cwd, "config"); err == nil {
@@ -40,7 +55,7 @@ func getConfig(path string) *config {
 	}
 
 	//反序列化到结构体
-	var config config
+	var config RootConfig
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		log.Fatalf("解析 YAML 失败: %v", err)

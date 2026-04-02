@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/14132465/vGate/net/app/config"
 	"github.com/14132465/vGate/net/data"
 	"github.com/14132465/vGate/net/logic"
 )
@@ -15,7 +16,8 @@ type gate struct {
 	SubHelper *logic.SubscriptionHelper
 	//密钥 用于网关与服务器通讯，判断是否一致
 	//SecretKey string
-	Config *config
+	Config *config.RootConfig
+	//ZapLog *zap.Logger
 }
 
 //const Gate  = &gate{}
@@ -26,11 +28,20 @@ var (
 
 func init() {
 	VGate = &gate{
-		Config:         getConfig("config.yaml"),
+		Config:         config.GetConfig("config.yaml"),
 		SessionManager: data.SessionManagerInstance,
 		ServerManager:  data.ServerManagerInstance,
 		SubHelper:      logic.SubHelper,
+		//ZapLog:         Log,
 	}
+
+	//defer Log.Sync()
+
+	if err := InitLogger(VGate.Config); err != nil {
+		panic(err)
+	}
+	Log.Info("服务启动成功")
+
 }
 
 // CheckSecretKey检查提供的密钥是否与全局密钥匹配

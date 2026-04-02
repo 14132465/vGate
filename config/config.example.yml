@@ -9,6 +9,19 @@ gate:
 debug: true #debug模式是否开启
 
 
-log: #日志配置
-  open: true
-  path: "/log"
+#日志配置
+logger:
+  level: "info"              # debug, info, warn, error
+  encoding: "console"           # json 或 console
+  output_paths:
+    - "stdout"               # 控制台输出
+    - "./logs/app.log"
+  error_output_paths:
+    - "stderr"
+  lumberjack:
+    max_size: 5         # MB 单个日志文件达到此大小时触发切割
+    max_backups: 5      # 最多保留的旧日志文件数量
+    max_age: 30         # 天 旧日志文件最长保留时间，超过则自动删除
+    compress: true      # 切割后的旧文件是否用 gzip 压缩
+  caller_skip: 1    # 跳过调用栈的层数，让日志显示正确的文件和行号
+  add_caller: true  # 是否在日志中记录调用位置（文件名:行号）

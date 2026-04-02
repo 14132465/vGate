@@ -59,7 +59,7 @@ func NewWsClientAlwaysOnlie() *WsClient {
 	WsClient := WsClient{}
 	WsClient.pool = coroutine.NewCoroutineGroup(1, "WsClient_msg_group", 4)
 	WsClient.maxRetries = 1000 * 60 * 60 * 24 //24小时 毫秒数
-	WsClient.retryInterval = time.Millisecond * 100
+	WsClient.retryInterval = time.Millisecond * 1
 	WsClient.maxRetries = WsClient.maxRetries / int(WsClient.retryInterval.Milliseconds()) //保证能重连24小时
 	return &WsClient
 }
