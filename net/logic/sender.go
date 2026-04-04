@@ -18,8 +18,8 @@ type sender struct {
 	Conf       *config.RootConfig
 	Conn       *websocket.Conn
 	serverName string
-	isServer   bool   //是否为服务端
-	SecretKey  string //密钥
+	isServer   bool //是否为服务端
+	//SecretKey  string //密钥
 }
 
 // 消息发送者 网关
@@ -139,7 +139,7 @@ func (this *sender) Subscription(topic string) error {
 		return errors.New("需要绑定连接, 方法 BindConn(conn websocket.Conn) !")
 	} else {
 		//连接可用
-		msg := data.BuildSubscriptionMsg(topic, this.serverName, this.SecretKey)
+		msg := data.BuildSubscriptionMsg(topic, this.serverName, this.Conf.Gate.SecretKey)
 		err := this.Conn.WriteJSON(msg)
 		if err != nil {
 			fmt.Printf("SendMessage  error %v \n", err)
