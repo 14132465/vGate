@@ -20,7 +20,7 @@ var uuid atomic.Int64
 
 type AppService struct {
 	*data.Session
-	Path          string
+	Url           string
 	pool          *coroutine.CoroutineGroup
 	handler       handler.ServiceAcceptInterface
 	isConnected   bool
@@ -39,8 +39,8 @@ func (this *AppService) Handler(handler handler.ServiceAcceptInterface) *AppServ
 }
 
 // 配置 WsServer 的端口和路径
-func (this *AppService) Config(Path string) *AppService {
-	this.Path = Path
+func (this *AppService) Config(url string) *AppService {
+	this.Url = url
 	return this
 }
 
@@ -83,7 +83,7 @@ func (this *AppService) Connect(onConnectedCallBack func(conn *websocket.Conn)) 
 			env.Log.Info(fmt.Sprintf("尝试连接 (第 %d/%d 次)...", i+1, this.maxRetries))
 		}
 
-		conn, _, err = websocket.DefaultDialer.Dial(this.Path, nil)
+		conn, _, err = websocket.DefaultDialer.Dial(this.Url, nil)
 		if err == nil {
 			env.Log.Info("连接成功！")
 

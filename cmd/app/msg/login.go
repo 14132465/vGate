@@ -7,7 +7,7 @@ import (
 )
 
 func Decoder(wsMsg *data.WebsocketMsg, reqMsg any) error {
-	err := json.Unmarshal(wsMsg.Content, reqMsg)
+	err := json.Unmarshal(wsMsg.Data, reqMsg)
 	return err
 }
 

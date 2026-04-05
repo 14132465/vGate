@@ -9,13 +9,13 @@ import (
 )
 
 func TestDecoder_LoginRequest(t *testing.T) {
-	// WsMsg declares its own Content field, which shadows BaseMsg.Content for ws.Content.
+	// WsMsg declares its own data field, which shadows BaseMsg.data for ws.data.
 	ws := &data.WebsocketMsg{
 		BaseMsg: data.BaseMsg{
 			Cmd:   data.Request,
 			Topic: "login",
 		},
-		Content: json.RawMessage(`{"User":"alice","Pass":"secret"}`),
+		Data: json.RawMessage(`{"User":"alice","Pass":"secret"}`),
 	}
 	var req LoginRequest
 	if err := Decoder(ws, &req); err != nil {
@@ -29,7 +29,7 @@ func TestDecoder_LoginRequest(t *testing.T) {
 func TestDecoder_LoginRequest_InvalidJSON(t *testing.T) {
 	ws := &data.WebsocketMsg{
 		BaseMsg: data.BaseMsg{
-			Content: json.RawMessage(`{`),
+			Data: json.RawMessage(`{`),
 		},
 	}
 	var req LoginRequest

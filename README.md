@@ -96,7 +96,7 @@ func iniRegistry() {
 - ** 登录 
 
 ```bash
-{"cmd":"request","topic":"/user/login","content":{"user":"jack" , "pass":"123456"}}
+{"cmd":"request","topic":"/user/login","data":{"user":"jack" , "pass":"123456"}}
 ```
 
 
@@ -104,7 +104,7 @@ func iniRegistry() {
 
 ```bash
 
-{"cmd":"request","topic":"/hall/game_list","content":{}
+{"cmd":"request","topic":"/hall/game_list","data":{}
 
 ```
 
@@ -124,5 +124,5 @@ func iniRegistry() {
 以上请求将成功订阅 /user/login topic ，当有其它客户端使用 下面的请求时将会收到它的消息
 
 ```bash
-{"cmd":"request","topic":"/user/login","content":{"user":"jack" , "pass":"123456"}}
+{"cmd":"request","topic":"/user/login","data":{"user":"jack" , "pass":"123456"}}
 ```

@@ -40,7 +40,7 @@ func (this *GateHandler) OnMessage(ctx WebSocketContext) error {
 
 	custom := data.CustomMessage{
 		WebsocketMsg: *msg,
-		HideFields:   []string{"content", "secretKey"}, // 隐藏敏感字段
+		HideFields:   []string{"data", "secretKey"}, // 隐藏敏感字段
 	}
 	jsonData, _ := json.Marshal(custom)
 	//jsonData, _ := json.MarshalIndent(custom, "", "  ")
@@ -105,7 +105,7 @@ func (this *GateHandler) OnMessage(ctx WebSocketContext) error {
 		}
 		return nil
 	default:
-		log.Error("收到未知的消息 %#v ", string(msg.Content))
+		log.Error("收到未知的消息 %#v ", string(msg.Data))
 		//fmt.Printf("  GateHandler :  OnMessage  %v \n", msg)
 	}
 

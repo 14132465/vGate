@@ -21,37 +21,37 @@ func BuildUnSubscriptionMsg(topic string, serverName string) *UnSubscriptionMsg 
 }
 
 //构建 发布 的消息
-// func BuildPublishMsg(clientId string, topic string, content string) *PublishMsg {
+// func BuildPublishMsg(clientId string, topic string, data string) *PublishMsg {
 // 	return &PublishMsg{
 // 		BaseMsg:  BaseMsg{Cmd: Subscription, Topic: topic},
 // 		ClientId: clientId,
-// 		Content:  json.RawMessage(content),
+// 		Data:  json.RawMessage(data),
 // 	}
 // }
 
 //构建 通知 的消息
-func BuildNoticeMsg(secretKey string, topic string, content []byte) *NoticeMsg {
+func BuildNoticeMsg(secretKey string, topic string, data []byte) *NoticeMsg {
 	return &NoticeMsg{
-		BaseMsg: BaseMsg{Cmd: Notice, Topic: topic, Content: json.RawMessage(content)},
+		BaseMsg: BaseMsg{Cmd: Notice, Topic: topic, Data: json.RawMessage(data)},
 
 		SecretKey: secretKey,
 	}
 }
 
 //构建 客户端请求 的消息
-func BuildRequestMsg(sessionId int64, topic string, content []byte) *RequestMsg {
+func BuildRequestMsg(sessionId int64, topic string, data []byte) *RequestMsg {
 	return &RequestMsg{
 		BaseMsg:   BaseMsg{Cmd: Request, Topic: topic},
-		Content:   json.RawMessage(content),
+		Data:      json.RawMessage(data),
 		SessionId: sessionId,
 	}
 }
 
 //构建 客户端请求 的消息
-func BuildResponseMsg(sessionId int64, topic string, content []byte) *ResponseMsg {
+func BuildResponseMsg(sessionId int64, topic string, data []byte) *ResponseMsg {
 	return &ResponseMsg{
 		BaseMsg:   BaseMsg{Cmd: Response, Topic: topic},
-		Content:   json.RawMessage(content),
+		Data:      json.RawMessage(data),
 		SessionId: sessionId,
 	}
 }

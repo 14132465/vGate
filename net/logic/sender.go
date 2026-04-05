@@ -65,7 +65,7 @@ func (this *sender) Notice(topic string, msg any) error {
 // 	if !this.isServer {
 // 		return errors.New("客户端不能使用该方法!")
 // 	}
-// 	return this.sendMsg(userId, data.Response, msg.GetTopic(), msg.GetContent())
+// 	return this.sendMsg(userId, data.Response, msg.GetTopic(), msg.GetData())
 // }
 
 // 响应 request
@@ -97,7 +97,7 @@ func (this *sender) sendMsg(userId int64, cmd string, topic string, msg any) err
 		return errors.New("需要绑定连接, 方法 BindConn(conn websocket.Conn) !")
 	} else {
 
-		content, err := json.Marshal(msg)
+		msgData, err := json.Marshal(msg)
 		if err != nil {
 			return err
 		}
@@ -105,11 +105,11 @@ func (this *sender) sendMsg(userId int64, cmd string, topic string, msg any) err
 		var sendMsg any
 		switch cmd {
 		case data.Notice:
-			sendMsg = data.BuildNoticeMsg(this.Conf.Gate.SecretKey, topic, content)
+			sendMsg = data.BuildNoticeMsg(this.Conf.Gate.SecretKey, topic, msgData)
 		case data.Request:
-			sendMsg = data.BuildRequestMsg(userId, topic, content)
+			sendMsg = data.BuildRequestMsg(userId, topic, msgData)
 		case data.Response:
-			sendMsg = data.BuildResponseMsg(userId, topic, content)
+			sendMsg = data.BuildResponseMsg(userId, topic, msgData)
 		default:
 
 			log.Error("要发送的消息类型 在意料中外 ， 将会丢弃消息")

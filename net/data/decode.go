@@ -28,7 +28,7 @@ func ServerDecoder(ndMsg NoDecoderMsg) (*WebsocketMsg, error) {
 				Topic: "",
 			},
 			SessionId: ndMsg.SessionId,
-			Content:   json.RawMessage(ndMsg.Msg),
+			Data:      json.RawMessage(ndMsg.Msg),
 		}
 		return &msg, err
 	}
@@ -48,26 +48,29 @@ func GateDecoder(ndMsg NoDecoderMsg) (*WebsocketMsg, error) {
 				Topic: "",
 			},
 			SessionId: ndMsg.SessionId,
-			Content:   json.RawMessage(ndMsg.Msg),
+			Data:      json.RawMessage(ndMsg.Msg),
 		}
 		return &msg, err
 	}
 
 	// 根据命令类型设置 SessionId
 	switch msg.Cmd {
-	case Response, Notice:
+	case Response:
+		//Response类型是app发给client的，其SessionId指向的是client的sessionId,
+		// Notice
 		// SessionId 保持原样
 		return &msg, nil
-	case Request, Heartbeat, Subscription, UnSubscription:
+	case Request, Heartbeat, Subscription, UnSubscription, Notice:
 		//Request 需要设置 SessionId
 		msg.SessionId = ndMsg.SessionId
 		return &msg, nil
 
 	default:
-		// 未知命令：设置 SessionId 并标记为 Unknown
+		// 未知命令：设置 SessionId 并标记cmd为 Unknown
 		msg.SessionId = ndMsg.SessionId
-		msg.Cmd = Unknown
-		msg.Content = json.RawMessage(ndMsg.Msg)
+		//msg.Cmd = Unknown
+		msg.Cmd = Request //简化，默认为客户端请求，可以省掉一个字段
+		msg.Data = json.RawMessage(ndMsg.Msg)
 		return &msg, nil
 	}
 }

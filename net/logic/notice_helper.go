@@ -39,7 +39,7 @@ func (this *NoticeHelper) Handler(msg *data.WebsocketMsg) bool {
 
 	if msg.Topic == Session_Id_Change {
 		change := SessionIdChange{}
-		err := json.Unmarshal(msg.Content, &change)
+		err := json.Unmarshal(msg.Data, &change)
 		if err != nil {
 			log.Error(fmt.Printf("SessionIdChange 反序列化出错 %v ", msg))
 		} else {

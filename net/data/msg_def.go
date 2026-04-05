@@ -29,14 +29,14 @@ const (
 type BaseMsgInterFace interface {
 	GetCmd() string
 	GetTopic() string
-	GetContent() json.RawMessage
+	GetData() json.RawMessage
 }
 
 // 基础消息
 type BaseMsg struct {
-	Cmd     string          `json:"cmd"`     //消息指令 如：订阅Subscription、发布Publish、通知Notice、请求Request、回复Response等
-	Topic   string          `json:"topic"`   //订阅主题
-	Content json.RawMessage `json:"content"` // 保留原始 JSON
+	Cmd   string          `json:"cmd"`   //消息指令 如：订阅Subscription、发布Publish、通知Notice、请求Request、回复Response等
+	Topic string          `json:"topic"` //订阅主题
+	Data  json.RawMessage `json:"data"`  // 保留原始 JSON
 
 }
 
@@ -47,8 +47,8 @@ func (this *BaseMsg) GetCmd() string {
 func (this *BaseMsg) GetTopic() string {
 	return this.Topic
 }
-func (this *BaseMsg) GetContent() json.RawMessage {
-	return this.Content
+func (this *BaseMsg) GetData() json.RawMessage {
+	return this.Data
 }
 
 // 心跳
@@ -81,7 +81,7 @@ type UnSubscriptionMsg = SubscriptionMsg
 // type PublishMsg struct {
 // 	BaseMsg
 // 	ClientId string          `json:"clientId"` //发布消息的客户端ID
-// 	Content  json.RawMessage `json:"content"`  // 保留原始 JSON
+// 	Data  json.RawMessage `json:"data"`  // 保留原始 JSON
 // }
 
 // 通知消息 向所有服务器 发起通知 , 服务器无需订阅
@@ -94,7 +94,7 @@ type NoticeMsg struct {
 type RequestMsg = struct {
 	BaseMsg
 	SessionId int64           `json:"sessionId"` //发布消息的客户端ID
-	Content   json.RawMessage `json:"content"`   // 保留原始 JSON
+	Data      json.RawMessage `json:"data"`      // 保留原始 JSON
 }
 
 // 回复消息 客户端回复服务器的请求
@@ -106,7 +106,7 @@ type WebsocketMsg struct {
 	ServerName string          `json:"serverName"` //服务器名称
 	SessionId  int64           `json:"sessionId"`  //发布消息的客户端ID
 	SecretKey  string          `json:"secretKey"`  //密钥
-	Content    json.RawMessage `json:"content"`    // 保留原始 JSON
+	Data       json.RawMessage `json:"data"`       // 保留原始 JSON
 }
 
 // CustomMessage 自定义序列化

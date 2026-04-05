@@ -37,7 +37,7 @@ func (this *ServerHandler) OnMessage(ctx WebSocketContext) error {
 		log.Info(fmt.Printf("### ServerHandler  cmd = Notice, Topic = %v 通知消息，没有订阅，也会收到的类型 \n", msg.Topic))
 	case data.Request:
 		//客户端请求消息
-		by, err := msg.Content.MarshalJSON()
+		by, err := msg.Data.MarshalJSON()
 		if err != nil {
 			return err
 		} else {
@@ -59,7 +59,7 @@ func (this *ServerHandler) OnMessage(ctx WebSocketContext) error {
 
 	custom := data.CustomMessage{
 		WebsocketMsg: *msg,
-		HideFields:   []string{"content", "secretKey"}, // 隐藏敏感字段
+		HideFields:   []string{"data", "secretKey"}, // 隐藏敏感字段
 	}
 	jsonData, _ := json.Marshal(custom)
 	//jsonData, _ := json.MarshalIndent(custom, "", "  ")
