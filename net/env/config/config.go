@@ -43,9 +43,14 @@ type LumberjackConfig struct {
 // 自动 在config目录查找 path
 func GetConfig(path string) *RootConfig {
 
-	cwd, _ := os.Getwd()
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Printf(" err path = %v \n", err)
+	}
+	//fmt.Printf(" path = %v \n", cwd)
 	if folder, err := FindFolderUpward(cwd, "config"); err == nil {
-		path = folder + "\\" + path
+		path = filepath.Join(folder, path)
+		fmt.Printf(" config file form path = %v \n", path)
 	}
 
 	//反序列化到结构体
