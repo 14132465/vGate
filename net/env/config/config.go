@@ -66,7 +66,7 @@ func GetConfig(path string) *RootConfig {
 		config.Gate.HeartbeatTime = 3
 		config.Gate.ReadOverTime = 7
 		by, _ := json.MarshalIndent(config.Gate, "", "     ")
-		fmt.Printf("读取配置[config/"+path+"] 失败: \n error :  %v  \n 系统启用默认配置  \n  %v ", err, string(by))
+		fmt.Printf("读取配置["+path+"] 失败: \n error :  %v  \n 系统启用默认配置  \n  %v ", err, string(by))
 	} else {
 		err = yaml.Unmarshal(data, &config)
 		if err != nil {
