@@ -9,16 +9,27 @@
 
 
 ### 网关示例
+
+下载包
+```base
+go get github.com/yz778899/vGate
+```
+
 ```go
 
-func main() {
-	defer env.Log.Sync()
+//一行代码启动
+net.NewWsServer().Run() 
 
-	handler := handler.GateHandler{}
-	err := net.NewWsServer().Config(8080, "/").Handler(&handler).Run()
-	if err != nil {
-		env.Log.Fatal("Server failed to start: ", zap.Error(err))
-	}
+//或者配置参数
+err := net.NewWsServer().WithConfig(&config.GateConfig{
+	WsPath:        "/",  //websocket路径
+	WsPort:        6789, //网关启动端口
+	SecretKey:     "",   //密钥 如设置 app 与 gate 双方需要一致，为空则不较验
+	HeartbeatTime: 3,    //心跳频率 -- 仅 app服务需要 gate不需要
+	ReadOverTime:  7,    //读写超时秒数
+}).Run()
+if err != nil {
+	fmt.Printf("gate failed to start: %v ", err)
 }
 ```
 ### 服务端示例
