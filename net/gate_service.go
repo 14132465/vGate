@@ -46,12 +46,6 @@ func (this *GateServer) Handler(handler handler.ServiceAcceptInterface) *GateSer
 
 // 运行 WsServer，监听指定端口并处理 WebSocket 连接和消息
 func (this *GateServer) Run() error {
-	// if this.handler == nil {
-	// 	this.handler = &handler.GateHandler{}
-	// }
-	// if this.Conf == nil {
-	// 	this.Conf = &env.VGate.Config.Gate
-	// }
 	http.HandleFunc(this.conf.WsPath, this.wsServerHandler)
 	env.Log.Info(fmt.Sprintf("WsServer run , port : %v", this.conf.WsPort))
 	return http.ListenAndServe(fmt.Sprintf(":%v", this.conf.WsPort), nil)
@@ -81,13 +75,13 @@ func (this *GateServer) wsServerHandler(w http.ResponseWriter, r *http.Request) 
 	conn.SetReadDeadline(time.Now().Add(time.Duration(this.conf.ReadOverTime) * time.Second))
 
 	session := this.handler.OnConnect(conn)
-
+	Log.Info(fmt.Sprintf(" curr connected count = %v  . ", env.VGate.SessionMgr.Count()))
 	for {
 		// 读取客户端消息
 		_, originalMsgByteArray, err := conn.ReadMessage()
 		if err != nil {
 			conn.Close()
-			Log.Info(" the connect close :", zap.Any("err", err))
+			Log.Error(fmt.Sprintf(" curr connected count = %v  . the connect close :", env.VGate.SessionMgr.Count()), zap.Any("err", err))
 			this.handler.OnDisconnect(session)
 			break
 		}

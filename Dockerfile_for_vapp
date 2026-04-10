@@ -40,4 +40,4 @@ WORKDIR /application
 ENTRYPOINT ["./vapp"]
 
 # 打包镜像  在控制台执行 docker build -t vapp:v1.0 -f Dockerfile_for_vapp .
-# 以容器运行 docker run -d --name vapp  vapp:v1.0
+# 以容器运行 docker run -d -e WS_URL="ws://172.17.0.4:5566/" --name vapp  vapp:v1.0

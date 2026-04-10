@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"runtime"
 
 	"github.com/gorilla/websocket"
@@ -15,11 +16,16 @@ import (
 var AppService *net.AppService
 
 func main() {
+	wsURL := os.Getenv("WS_URL")
+	if wsURL == "" {
+		// 默认使用 Docker 网桥的网关 IP
+		wsURL = "ws://vgate-ip:5566/"
+	}
 	//注册消息管理者
 	iniRoute()
 
 	//创建服务端  host.docker.internal = docker的宿主机
-	app := net.NewAppService().Config("ws://host.docker.internal:5566/", runtime.NumCPU()*2)
+	app := net.NewAppService().Config(wsURL, runtime.NumCPU()*2)
 	//app := net.NewAppService().Config("ws://localhost:5566/", runtime.NumCPU()*2)
 	AppService = app
 	//业务处理器

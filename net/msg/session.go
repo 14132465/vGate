@@ -91,6 +91,14 @@ func (sm *SessionManager) AddSession(session *Session) *Session {
 
 }
 
+// 连接数量
+func (sm *SessionManager) Count() int {
+	defer sm.mutex.Unlock()
+	sm.mutex.Lock()
+	num := len(sm.sessionMap)
+	return num
+}
+
 // 移除会话信息
 func (sm *SessionManager) RemoveSession(uuid int64) {
 	defer sm.mutex.Unlock()

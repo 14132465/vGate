@@ -10,12 +10,12 @@ import (
 
 func main() {
 
-	// 启动 10000 个客户端连续发送登录消息
-	time.Sleep(time.Millisecond * 1000 * 10)
+	time.Sleep(time.Millisecond * 1000 * 3)
 	start := time.Now()
-	for i := 0; i < 1000; i++ {
+	// 启动 1000 个客户端连续发送登录消息
+	for i := 0; i < 10000; i++ {
 		go func(id int) {
-			app := net.NewAppClient().Config("ws://localhost:5566/")
+			app := net.NewAppClient().Config("ws://test-app:5566/")
 			app.Handler(&ClientHandler{}).Connect(func(conn *websocket.Conn) {
 				app.ConnSession.SendToGate("/user/login", LoginMsg())
 			})
@@ -23,6 +23,8 @@ func main() {
 
 		if i%100 == 0 {
 			fmt.Printf("已启动 %d 个 goroutine\n", i)
+			//runtime.Gosched()
+			time.Sleep(time.Millisecond * 1000)
 		}
 		time.Sleep(time.Millisecond * 1)
 	}

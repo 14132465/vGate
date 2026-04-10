@@ -40,4 +40,7 @@ WORKDIR /application
 ENTRYPOINT ["./vgate"]
 
 #在控制台执行 docker build -t vgate:v1.0 -f Dockerfile_for_vgate .
-# 以容器运行 docker run -d -p 5566:5566 --name vgate-app  vgate:v1.0
+# 以容器运行 docker run -d -p 5566:5566 --add-host host.docker.internal:host-gateway --name vgate-app  vgate:v1.0
+# 运行容器时添加 host 映射
+#docker run --add-host host.docker.internal:host-gateway your-image
+

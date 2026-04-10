@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"runtime"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -143,7 +144,7 @@ func (this *AppClient) readMsg() error {
 
 		countMsg.Add(1)
 		num := countMsg.Load()
-		if num%int64(2) == 0 {
+		if num%int64(200) == 3 {
 			fmt.Printf(" app_service revicer , msg count = %v  : %v", countMsg.Load(), theMsg)
 		}
 
@@ -155,6 +156,8 @@ func (this *AppClient) readMsg() error {
 			Original: &originalMsgByteArray,
 			WsMsg:    WsMsg,
 		})
+
+		runtime.Gosched()
 	}
 }
 
